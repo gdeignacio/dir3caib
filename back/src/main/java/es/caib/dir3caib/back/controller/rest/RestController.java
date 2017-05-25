@@ -1,8 +1,17 @@
 package es.caib.dir3caib.back.controller.rest;
 
 import es.caib.dir3caib.persistence.ejb.ArbolLocal;
+import es.caib.dir3caib.persistence.ejb.CatAmbitoTerritorialLocal;
+import es.caib.dir3caib.persistence.ejb.CatComunidadAutonomaLocal;
+import es.caib.dir3caib.persistence.ejb.CatEntidadGeograficaLocal;
 import es.caib.dir3caib.persistence.ejb.CatEstadoEntidadLocal;
+import es.caib.dir3caib.persistence.ejb.CatNivelAdministracionLocal;
+import es.caib.dir3caib.persistence.ejb.CatProvinciaLocal;
 import es.caib.dir3caib.persistence.ejb.Dir3RestLocal;
+import es.caib.dir3caib.persistence.model.CatComunidadAutonoma;
+import es.caib.dir3caib.persistence.model.CatEntidadGeografica;
+import es.caib.dir3caib.persistence.model.CatNivelAdministracion;
+import es.caib.dir3caib.persistence.model.CatProvincia;
 import es.caib.dir3caib.persistence.model.Dir3caibConstantes;
 import es.caib.dir3caib.persistence.model.Oficina;
 import es.caib.dir3caib.persistence.model.Unidad;
@@ -40,6 +49,18 @@ public class RestController {
 
     @EJB(mappedName = "dir3caib/CatEstadoEntidadEJB/local")
     protected CatEstadoEntidadLocal catEstadoEntidadEjb;
+    
+    @EJB(mappedName = "dir3caib/CatComunidadAutonomaEJB/local")
+    protected CatComunidadAutonomaLocal catComunidadAutonomaEjb;
+    
+    @EJB(mappedName = "dir3caib/CatEntidadGeograficaEJB/local")
+    protected CatEntidadGeograficaLocal catEntidadGeograficaEjb;
+    
+    @EJB(mappedName = "dir3caib/CatProvinciaEJB/local")
+    protected CatProvinciaLocal catProvinciaEjb;
+    
+    @EJB(mappedName = "dir3caib/CatNivelAdministracionEJB/local")
+    protected CatNivelAdministracionLocal catNivelAdministracionEjb;
 
 
     /**
@@ -197,7 +218,129 @@ public class RestController {
 
 
 
+   //
+   // Métodos de catàlogo
+   //
+   
+    
+    /**
+     * Obtiene los
+     * {@link es.caib.dir3caib.persistence.model.CatComunidadAutonoma}
+     *
+     */
+    @RequestMapping(value = "/catalogo/comunidadesAutonomas", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<List<CatComunidadAutonoma>> comunidadesAutonomas() throws Exception {
+        log.info("dentro rest comunidadesAutonomas");
 
+        List<CatComunidadAutonoma> resultado = catComunidadAutonomaEjb.getAll();
+
+        log.info(" Comunidades Autonomas encontradas: " + resultado.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+        return new ResponseEntity<List<CatComunidadAutonoma>>(resultado, headers, HttpStatus.OK);
+    }
+
+    
+    /**
+     * Obtiene los
+     * {@link es.caib.dir3caib.persistence.model.CatEntidadGeografica}
+     *
+     */
+    @RequestMapping(value = "/catalogo/entidadesGeograficas", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<List<CatEntidadGeografica>> entidadesGeograficas() throws Exception {
+        log.info("dentro rest entidadesGeograficas");
+
+        List<CatEntidadGeografica> resultado = catEntidadGeograficaEjb.getAll();
+
+        log.info(" Entidades geograficas encontradas: " + resultado.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+        return new ResponseEntity<List<CatEntidadGeografica>>(resultado, headers, HttpStatus.OK);
+    }
+
+   
+     /**
+     * Obtiene los
+     * {@link es.caib.dir3caib.persistence.model.CatProvincia}
+     *
+     */
+    @RequestMapping(value = "/catalogo/provincias", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<List<CatProvincia>> provincias() throws Exception {
+        log.info("dentro rest provincias");
+
+        List<CatProvincia> resultado = catProvinciaEjb.getAll();
+
+        log.info(" Provincias encontradas: " + resultado.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+        return new ResponseEntity<List<CatProvincia>>(resultado, headers, HttpStatus.OK);
+    }
+
+    
+     /**
+     * Obtiene los
+     * {@link es.caib.dir3caib.persistence.model.CatProvincia}
+     *
+     */
+    @RequestMapping(value = "/catalogo/provinciasca", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<List<CatProvincia>> provinciasCA(@RequestParam Long codComunidadAutonoma) throws Exception {
+        log.info("dentro rest provinciasCA");
+
+        List<CatProvincia> resultado = catProvinciaEjb.getByComunidadAutonoma(codComunidadAutonoma);
+
+        log.info(" Provincias encontradas: " + resultado.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+        return new ResponseEntity<List<CatProvincia>>(resultado, headers, HttpStatus.OK);
+    }
+    
+     /**
+     * Obtiene los
+     * {@link es.caib.dir3caib.persistence.model.CatProvincia}
+     *
+     */
+    @RequestMapping(value = "/catalogo/nivelAdministracion", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<List<CatNivelAdministracion>> nivelAdministracion() throws Exception {
+        log.info("dentro rest nivel administracion");
+
+        List<CatNivelAdministracion> resultado = catNivelAdministracionEjb.getAll();
+
+        log.info(" Niveles administracion encontrados: " + resultado.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+        return new ResponseEntity<List<CatNivelAdministracion>>(resultado, headers, HttpStatus.OK);
+    }
+    
+    
+    
+    /**
+     * Obtiene las {@link es.caib.dir3caib.persistence.model.Unidad} en función de los criterios de busqueda
+     */
+     @RequestMapping(value = "/busqueda/organismosRaiz", method = RequestMethod.GET)
+     public @ResponseBody
+     ResponseEntity<List<ObjetoBasico>> busquedaOrganismosRaiz(@RequestParam Long codNivelAdministracion, @RequestParam Long codComunidadAutonoma, @RequestParam boolean conOficinas, @RequestParam boolean unidadRaiz, @RequestParam Long provincia, @RequestParam String localidad) throws Exception {
+
+        log.info("dentro rest busqueda organismos");
+        //log.info("dentro rest busqueda organismos ISO lenght: " + new String(denominacion.getBytes("ISO-8859-1"), "UTF-8").length());
+        //Transformamos el campo denominacion de ISO a UTF-8 para realizar las búsquedas en bd que estan en UTF-8.
+         //Esto se hace porque el @RequestParam viene en ISO-8859-1.
+         List<ObjetoBasico> unidades = dir3RestEjb.busquedaOrganismos(null, null, codNivelAdministracion, codComunidadAutonoma, conOficinas, true, provincia, localidad);
+        log.info("Organismos encontrados " + unidades.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+
+         return new ResponseEntity<List<ObjetoBasico>>(unidades, headers, HttpStatus.OK);
+
+         //Pruebas con cache rest
+        //return new ResponseEntity<List<ObjetoBasico>>(unidades, headers, HttpStatus.NOT_MODIFIED);
+
+     }
+    
+    
+    
+    
+    //
+    // End metodos de catalogo
+    //
 
 
      private HttpHeaders addAccessControllAllowOrigin() {
