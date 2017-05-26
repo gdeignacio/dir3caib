@@ -1,6 +1,8 @@
 package es.caib.dir3caib.persistence.ejb;
 
 import es.caib.dir3caib.persistence.model.CatLocalidad;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jboss.ejb3.annotation.SecurityDomain;
@@ -11,6 +13,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -91,6 +94,46 @@ public class CatLocalidadBean extends BaseEjbJPA<CatLocalidad, Long> implements 
     public void deleteAll() throws Exception {
 
         em.createQuery("delete from CatLocalidad").executeUpdate();
+        
+    }
+
+    @Override
+    public List<CatLocalidad> findByProvincia(Long codigoProvincia, String codigoEntidadGeografica) throws Exception {
+
+        Query q;
+        Map<String, Object> parametros = new HashMap<String, Object>();
+        List<String> where = new ArrayList<String>();
+
+        StringBuffer query = new StringBuffer("Select catLocalidad from CatLocalidad as catLocalidad ");
+
+        where.add(" provincia.codigoProvincia = :codigoProvincia");
+        parametros.put("codigoProvincia", codigoProvincia);
+        if (codigoEntidadGeografica != null && codigoEntidadGeografica.length() > 0) {
+            where.add(" provincia.codigoEntidadGeografica = :codigoEntidadGeografica");
+            parametros.put("codigoEntidadGeografica", codigoEntidadGeografica);
+        }
+       
+        String strWhere = " where ";
+        for (String w:where){
+            query.append(strWhere);
+            query.append(w);
+            strWhere = " and ";
+        }
+        
+        q = em.createQuery(query.toString());
+        
+        for (Map.Entry<String, Object> param : parametros.entrySet()) {
+            q.setParameter(param.getKey(), param.getValue());
+        }
+        
+        List<CatLocalidad> resultado = new ArrayList<CatLocalidad>();
+        
+        for (Object obj:q.getResultList()){
+            resultado.add((CatLocalidad) obj);
+        }
+        
+        return resultado;
+        
         
     }
 }

@@ -5,11 +5,13 @@ import es.caib.dir3caib.persistence.ejb.CatAmbitoTerritorialLocal;
 import es.caib.dir3caib.persistence.ejb.CatComunidadAutonomaLocal;
 import es.caib.dir3caib.persistence.ejb.CatEntidadGeograficaLocal;
 import es.caib.dir3caib.persistence.ejb.CatEstadoEntidadLocal;
+import es.caib.dir3caib.persistence.ejb.CatLocalidadLocal;
 import es.caib.dir3caib.persistence.ejb.CatNivelAdministracionLocal;
 import es.caib.dir3caib.persistence.ejb.CatProvinciaLocal;
 import es.caib.dir3caib.persistence.ejb.Dir3RestLocal;
 import es.caib.dir3caib.persistence.model.CatComunidadAutonoma;
 import es.caib.dir3caib.persistence.model.CatEntidadGeografica;
+import es.caib.dir3caib.persistence.model.CatLocalidad;
 import es.caib.dir3caib.persistence.model.CatNivelAdministracion;
 import es.caib.dir3caib.persistence.model.CatProvincia;
 import es.caib.dir3caib.persistence.model.Dir3caibConstantes;
@@ -58,6 +60,9 @@ public class RestController {
     
     @EJB(mappedName = "dir3caib/CatProvinciaEJB/local")
     protected CatProvinciaLocal catProvinciaEjb;
+    
+    @EJB(mappedName = "dir3caib/CatLocalidadEJB/local")
+    protected CatLocalidadLocal catLocalidadEjb;
     
     @EJB(mappedName = "dir3caib/CatNivelAdministracionEJB/local")
     protected CatNivelAdministracionLocal catNivelAdministracionEjb;
@@ -294,9 +299,30 @@ public class RestController {
         return new ResponseEntity<List<CatProvincia>>(resultado, headers, HttpStatus.OK);
     }
     
+    
      /**
      * Obtiene los
      * {@link es.caib.dir3caib.persistence.model.CatProvincia}
+     *
+     */
+    @RequestMapping(value = "/catalogo/localidades", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<List<CatLocalidad>> localidades(@RequestParam Long codigoProvincia, String codigoEntidadGeografica) throws Exception {
+        log.info("dentro rest localidades");
+
+        List<CatLocalidad> resultado = catLocalidadEjb.findByProvincia(codigoProvincia, codigoEntidadGeografica); 
+        //catLocalidadEjb.getByComunidadAutonoma(codComunidadAutonoma);
+
+        log.info(" Localidades encontradas: " + resultado.size());
+        HttpHeaders headers = addAccessControllAllowOrigin();
+        return new ResponseEntity<List<CatLocalidad>>(resultado, headers, HttpStatus.OK);
+    }
+    
+    
+    
+     /**
+     * Obtiene los
+     * {@link es.caib.dir3caib.persistence.model.CatNivelAdministacion}
      *
      */
     @RequestMapping(value = "/catalogo/nivelAdministracion", method = RequestMethod.GET)
@@ -310,32 +336,6 @@ public class RestController {
         HttpHeaders headers = addAccessControllAllowOrigin();
         return new ResponseEntity<List<CatNivelAdministracion>>(resultado, headers, HttpStatus.OK);
     }
-    
-    
-    
-    /**
-     * Obtiene las {@link es.caib.dir3caib.persistence.model.Unidad} en función de los criterios de busqueda
-     */
-     @RequestMapping(value = "/busqueda/organismosRaiz", method = RequestMethod.GET)
-     public @ResponseBody
-     ResponseEntity<List<ObjetoBasico>> busquedaOrganismosRaiz(@RequestParam Long codNivelAdministracion, @RequestParam Long codComunidadAutonoma, @RequestParam boolean conOficinas, @RequestParam boolean unidadRaiz, @RequestParam Long provincia, @RequestParam String localidad) throws Exception {
-
-        log.info("dentro rest busqueda organismos");
-        //log.info("dentro rest busqueda organismos ISO lenght: " + new String(denominacion.getBytes("ISO-8859-1"), "UTF-8").length());
-        //Transformamos el campo denominacion de ISO a UTF-8 para realizar las búsquedas en bd que estan en UTF-8.
-         //Esto se hace porque el @RequestParam viene en ISO-8859-1.
-         List<ObjetoBasico> unidades = dir3RestEjb.busquedaOrganismos(null, null, codNivelAdministracion, codComunidadAutonoma, conOficinas, true, provincia, localidad);
-        log.info("Organismos encontrados " + unidades.size());
-        HttpHeaders headers = addAccessControllAllowOrigin();
-
-         return new ResponseEntity<List<ObjetoBasico>>(unidades, headers, HttpStatus.OK);
-
-         //Pruebas con cache rest
-        //return new ResponseEntity<List<ObjetoBasico>>(unidades, headers, HttpStatus.NOT_MODIFIED);
-
-     }
-    
-    
     
     
     //
